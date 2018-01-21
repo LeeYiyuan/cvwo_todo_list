@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Todo List">
+  <meta name="author" content="Yiyuan Lee">
+
+  <title>Todo List</title>
+
+  <script src="node_modules/jquery/dist/jquery.js"></script>
+  <link rel="stylesheet" type="text/css" href="node_modules/semantic-ui-css/semantic.min.css">
+  <script src="node_modules/semantic-ui-css/semantic.min.js"></script>
+  <link rel="stylesheet" type="text/css" href="node_modules/semantic-ui-calendar/dist/calendar.min.css">
+  <script src="node_modules/semantic-ui-calendar/dist/calendar.min.js"></script>
+  <script src="node_modules/js-cookie/src/js.cookie.js"></script>
+  <script src="node_modules/angular/angular.js"></script>
+  <link rel="stylesheet" type="text/css" href="css/style.css">
+</head>
+
+<body>
+  <div class="ui container" ng-app="todoApp" ng-controller="TodoController" ng-cloak>
+    <h1 class="todo-header ui center aligned header">Todo List</h1>
+  
+    <button class="ui right floated teal icon button" ng-click="createItem()">
+      <i class="add icon"></i>
+    </button>
+    <div class="todo-search ui fluid icon input">
+      <input type="text" placeholder="Search tags (e.g. dinner urgent family)..." ng-model="query">
+      <i class="search icon"></i>
+    </div>
+
+    <div class="ui message" ng-show="!items.length && !query.length">
+      <div class="header">
+        Todo List Empty
+      </div>
+      <p>Click on the plus icon to add something.</p>
+    </div>
+
+    <div class="ui message" ng-show="query.length && !(items | tagfilter:query).length">
+      <div class="header">
+        No Matching Results
+      </div>
+      <p>Your search did not match any item.</p>
+    </div>
+
+    <div class="ui segment" ng-show="items.length && (items | tagfilter:query).length">
+      <div class="ui divided items">
+        <div class="item" ng-repeat="item in items | tagfilter:query">
+          <div class="content">
+            <div class="header">{{item.title}}</div>
+            <div class="meta">
+              {{item.deadline | date:'MMMM d, yyyy h:mm a'}}
+            </div>
+            <div class="description">
+              <p>{{item.details}}</p>
+            </div>
+            <div class="extra">
+              <div class="mini ui red right floated icon button" ng-class="{'loading':item.isDeleting}" ng-click="deleteItem(item)">
+                <i class="delete icon"></i>
+              </div>
+              <div class="mini ui right floated icon button" ng-click="editItem(item)">
+                <i class="write icon"></i>
+              </div>
+              <div class="ui label" ng-repeat="tag in item.tags.split(' ') track by $index">{{tag}}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="todo-create-item-modal ui modal">
+      <i class="close icon"></i>
+      <div class="header">
+        Create Item
+      </div>
+      <div class="content">
+          <div class="todo-form ui form">
+            <div class="field">
+              <input type="text" placeholder="Title" ng-model="createItemTitle">
+            </div>
+            <div class="field">
+              <div class="ui calendar">
+                <input type="text" placeholder="Deadline" ng-model="createItemDeadline">
+              </div>
+            </div>
+            <div class="field">
+              <input type="text" placeholder="Details" ng-model="createItemDetails">
+            </div>
+            <div class="field">
+              <input type="text" placeholder="Tags (e.g. dinner urgent family)" ng-model="createItemTags">
+            </div>
+          </div>
+      </div>
+      <div class="actions">
+        <button class="ui cancel button">Cancel</button>
+        <button class="todo-create ui teal approve button" ng-class="{'loading':createItemIsCreating}">Create</button>
+      </div>
+    </div>
+
+    <div class="todo-edit-item-modal ui modal">
+      <i class="close icon"></i>
+      <div class="header">
+        Edit Item
+      </div>
+      <div class="content">
+          <div class="todo-form ui form">
+            <div class="field">
+              <input type="text" placeholder="Title" ng-model="editItemTitle">
+            </div>
+            <div class="field">
+              <div class="ui calendar">
+                <input type="text" placeholder="Deadline" ng-model="editItemDeadline">
+              </div>
+            </div>
+            <div class="field">
+              <input type="text" placeholder="Details" ng-model="editItemDetails">
+            </div>
+            <div class="field">
+              <input type="text" placeholder="Tags (e.g. dinner urgent family)" ng-model="editItemTags">
+            </div>
+          </div>
+      </div>
+      <div class="actions">
+        <button class="ui cancel button">Cancel</button>
+        <button class="todo-edit ui teal approve button" ng-class="{'loading':editItemIsSaving}">Save</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/index.js"></script>
+</body>
+</html>
